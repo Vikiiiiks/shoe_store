@@ -1,0 +1,121 @@
+﻿<Window x:Class="shoe_store.ProductListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+Title="Список товаров — Магазин обуви"
+Icon="/Images/app.ico"
+Height="760" Width="1100"
+WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <!-- Внешняя рамка карточки. Последний сработавший триггер выигрывает,
+поэтому самый важный цвет (нет на складе) стоит последним -->
+        <Style x:Key="ProductCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBigDiscount}" Value="True">
+                    <Setter Property="Background" Value="#2E8B57"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsLowStock}" Value="True">
+                    <Setter Property="Background" Value="#FF8080"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsOutOfStock}" Value="True">
+                    <Setter Property="Background" Value="LightBlue"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- Шапка: логотип, заголовок, ФИО в правом верхнем углу -->
+        <Border Grid.Row="0" Background="{StaticResource AdditionalBackgroundBrush}" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Source="/Images/Logo.png" Height="48" Stretch="Uniform"/>
+                <TextBlock Grid.Column="1" Text="Список товаров" FontSize="22" FontWeight="Bold"
+VerticalAlignment="Center" Margin="16,0"/>
+                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                    <TextBlock x:Name="UserNameTextBlock" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="RoleTextBlock" HorizontalAlignment="Right"/>
+                    <Button x:Name="LogoutButton" Content="Выйти" HorizontalAlignment="Right"
+Click="LogoutButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <!-- Кнопки, доступные в зависимости от роли -->
+        <WrapPanel Grid.Row="1" Margin="12,8">
+            <Button x:Name="AddProductButton" Content="Добавить товар" Click="AddProductButton_Click"/>
+            <Button x:Name="OrdersButton" Content="Заказы" Click="OrdersButton_Click"/>
+        </WrapPanel>
+        <!-- Список товаров -->
+        <ListBox x:Name="ProductsListBox" Grid.Row="2" Margin="12"
+HorizontalContentAlignment="Stretch"
+ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource ProductCardStyle}">
+                        <Grid Margin="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="170"/>
+                            </Grid.ColumnDefinitions>
+                            <!-- Левый блок: фото -->
+                            <Border Grid.Column="0" BorderBrush="Black" BorderThickness="2" Margin="2">
+                                <Image Source="{Binding Photo}" Width="150" Height="100"
+Stretch="Uniform"
+HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <!-- Средний блок: описание -->
+                            <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1"
+Margin="2" Padding="10,6">
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock FontWeight="Bold" FontSize="16" TextWrapping="Wrap">
+<Run Text="{Binding CategoryName, Mode=OneWay}"/>
+<Run Text=" | "/>
+<Run Text="{Binding ProductName, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding Description, StringFormat=Описание товара: {0}}"
+TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding ManufacturerName, StringFormat=Производитель: {0}}"/>
+                                    <TextBlock Text="{Binding SupplierName, StringFormat=Поставщик: {0}}"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Цена: "/>
+                                        <TextBlock Text="{Binding Price, StringFormat={}{0:N2}}"
+Foreground="Red" TextDecorations="Strikethrough"
+Margin="0,0,8,0"
+Visibility="{Binding HasDiscount, Converter={StaticResource BoolToVisibility}}"/>
+                                        <TextBlock Text="{Binding FinalPrice, StringFormat={}{0:N2}}"
+Foreground="Black"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding UnitName, StringFormat=Единица измерения: {0}}"/>
+                                    <TextBlock Text="{Binding StockQuantity, StringFormat=Количество на складе: {0}}"/>
+                                </StackPanel>
+                            </Border>
+                            <!-- Правый блок: скидка -->
+                            <Border Grid.Column="2" BorderBrush="Black" BorderThickness="2" Margin="2">
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Действующая скидка" TextAlignment="Center"
+TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Discount, StringFormat={}{0}%}"
+FontSize="26" FontWeight="Bold" TextAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>
+
